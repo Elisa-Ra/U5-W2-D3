@@ -1,6 +1,7 @@
 package elisaraeli.U5_W2_D3.services;
 
 import elisaraeli.U5_W2_D3.entities.Autore;
+import elisaraeli.U5_W2_D3.exceptions.BadRequestException;
 import elisaraeli.U5_W2_D3.exceptions.NotFoundException;
 import elisaraeli.U5_W2_D3.payloads.NewAuthorPayload;
 import lombok.extern.slf4j.Slf4j;
@@ -16,13 +17,20 @@ public class AuthorService {
 
     private List<Autore> authorsDB = new ArrayList<>();
 
-
     public List<Autore> findAll() {
         return this.authorsDB;
     }
 
-    // salvo un autore
+    // Salvo un autore
     public Autore save(NewAuthorPayload payload) {
+
+        if (payload.getNome() == null || payload.getNome().isBlank()) {
+            throw new BadRequestException("Il nome non può essere vuoto");
+        }
+        if (payload.getEmail() == null || payload.getEmail().isBlank()) {
+            throw new BadRequestException("L'email non può essere vuota");
+        }
+
         Autore newAuthor = new Autore(
                 payload.getNome(),
                 payload.getCognome(),
@@ -34,17 +42,19 @@ public class AuthorService {
                 payload.getNome() + "+" + payload.getCognome());
 
         this.authorsDB.add(newAuthor);
-        log.info("L'autore con id: " + newAuthor.getId() + " è stato aggiunto correttamente");
+        log.info("L'autore con id {} è stato creato correttamente!", newAuthor.getId());
 
         return newAuthor;
     }
 
-    // cerco un autore per id
+    // Cerco autore per id
     public Autore findById(UUID authorId) {
         Autore found = null;
 
         for (Autore autore : this.authorsDB) {
-            if (autore.getId() == authorId) found = autore;
+            if (autore.getId().equals(authorId)) {
+                found = autore;
+            }
         }
 
         if (found == null) throw new NotFoundException(authorId);
@@ -52,13 +62,18 @@ public class AuthorService {
         return found;
     }
 
-    // cerco un autore per id e lo aggiorno
+    // Cerco autore per id e lo aggiorno
     public Autore findByIdAndUpdate(UUID authorId, NewAuthorPayload payload) {
         Autore found = null;
 
         for (Autore autore : this.authorsDB) {
-            if (autore.getId() == authorId) {
+            if (autore.getId().equals(authorId)) {
                 found = autore;
+
+                if (payload.getNome() == null || payload.getNome().isBlank()) {
+                    throw new BadRequestException("Il nome non può essere vuoto");
+                }
+
                 found.setNome(payload.getNome());
                 found.setCognome(payload.getCognome());
                 found.setEmail(payload.getEmail());
@@ -68,23 +83,25 @@ public class AuthorService {
 
         if (found == null) throw new NotFoundException(authorId);
 
-        log.info("L'autore con id: " + authorId + " è stato aggiornato correttamente");
+        log.info("L'autore con id {} è stato aggiornato correttamente!", authorId);
 
         return found;
     }
 
-    // cerco un autore per id e lo elimino
+    // Cerco autore per id e lo elimino
     public void findByIdAndDelete(UUID authorId) {
         Autore found = null;
 
         for (Autore autore : this.authorsDB) {
-            if (autore.getId() == authorId) found = autore;
+            if (autore.getId().equals(authorId)) {
+                found = autore;
+            }
         }
 
         if (found == null) throw new NotFoundException(authorId);
 
         this.authorsDB.remove(found);
 
-        log.info("L'autore con id: " + authorId + " è stato eliminato correttamente");
+        log.info("L'autore con id {} è stato eliminato correttamente", authorId);
     }
 }

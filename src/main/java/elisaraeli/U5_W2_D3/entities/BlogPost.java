@@ -1,9 +1,6 @@
 package elisaraeli.U5_W2_D3.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.UUID;
@@ -25,6 +22,9 @@ public class BlogPost {
     private String cover; // lo genera il server
     private String contenuto;
     private int tempoDiLettura; // in minuti
+    @ManyToOne
+    @JoinColumn(name = "autore_id")
+    private Autore autore;
 
     public BlogPost(String categoria, String titolo, String contenuto, int tempoDiLettura) {
 
