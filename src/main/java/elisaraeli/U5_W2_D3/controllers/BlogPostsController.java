@@ -4,47 +4,58 @@ import elisaraeli.U5_W2_D3.entities.BlogPost;
 import elisaraeli.U5_W2_D3.payloads.NewBlogPostPayload;
 import elisaraeli.U5_W2_D3.services.BlogPostService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/blogPosts")
 public class BlogPostsController {
 
-    private final BlogPostService blogPostsService;
+    private final BlogPostService blogPostService;
 
     @Autowired
-    public BlogPostsController(BlogPostService blogPostsService) {
-        this.blogPostsService = blogPostsService;
+    public BlogPostsController(BlogPostService blogPostService) {
+        this.blogPostService = blogPostService;
     }
 
+    // GET
     @GetMapping
-    public List<BlogPost> findAll() {
-        return this.blogPostsService.findAll();
+    public Page<BlogPost> getAll(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "titolo") String orderBy,
+            @RequestParam(defaultValue = "asc") String sort
+    ) {
+        return this.blogPostService.findAll(page, size, orderBy, sort);
     }
 
+    // POST
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public BlogPost create(@RequestBody NewBlogPostPayload payload) {
-        return this.blogPostsService.save(payload);
+        return this.blogPostService.save(payload);
     }
 
-    @GetMapping("/{id}")
-    public BlogPost findById(@PathVariable UUID id) {
-        return this.blogPostsService.findById(id);
+    // GET by ID
+    @GetMapping("/{postId}")
+    public BlogPost getById(@PathVariable UUID postId) {
+        return this.blogPostService.findById(postId);
     }
 
-    @PutMapping("/{id}")
-    public BlogPost update(@PathVariable UUID id, @RequestBody NewBlogPostPayload payload) {
-        return this.blogPostsService.findByIdAndUpdate(id, payload);
+    // PUT
+    @PutMapping("/{postId}")
+    public BlogPost update(@PathVariable UUID postId, @RequestBody NewBlogPostPayload payload) {
+        return this.blogPostService.findByIdAndUpdate(postId, payload);
     }
 
-    @DeleteMapping("/{id}")
+    // DELETE
+    @DeleteMapping("/{postId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable UUID id) {
-        this.blogPostsService.findByIdAndDelete(id);
+    public void delete(@PathVariable UUID postId) {
+        this.blogPostService.findByIdAndDelete(postId);
     }
 }
+

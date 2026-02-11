@@ -29,9 +29,9 @@ public class ErrorsHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR) // 500
     public ErrorsPayload handleGenericServerError(Exception ex) {
         ex.printStackTrace();
-        
+
         return new ErrorsPayload(
-                "C'è stato un errore, giuro che lo risolveremo presto!",
+                "Ops! C'è stato un errore, verrà risolto presto!",
                 LocalDateTime.now()
         );
     }

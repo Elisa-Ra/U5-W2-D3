@@ -4,47 +4,57 @@ import elisaraeli.U5_W2_D3.entities.Autore;
 import elisaraeli.U5_W2_D3.payloads.NewAuthorPayload;
 import elisaraeli.U5_W2_D3.services.AuthorService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/authors")
 public class AuthorsController {
 
-    private final AuthorService authorsService;
+    private final AuthorService authorService;
 
     @Autowired
-    public AuthorsController(AuthorService authorsService) {
-        this.authorsService = authorsService;
+    public AuthorsController(AuthorService authorService) {
+        this.authorService = authorService;
     }
 
+    // GET
     @GetMapping
-    public List<Autore> findAll() {
-        return this.authorsService.findAll();
+    public Page<Autore> getAll(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "nome") String orderBy,
+            @RequestParam(defaultValue = "asc") String sort
+    ) {
+        return this.authorService.findAll(page, size, orderBy, sort);
     }
 
+    // POST
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Autore create(@RequestBody NewAuthorPayload payload) {
-        return this.authorsService.save(payload);
+        return this.authorService.save(payload);
     }
 
-    @GetMapping("/{id}")
-    public Autore findById(@PathVariable UUID id) {
-        return this.authorsService.findById(id);
+    // GET by ID
+    @GetMapping("/{authorId}")
+    public Autore getById(@PathVariable UUID authorId) {
+        return this.authorService.findById(authorId);
     }
 
-    @PutMapping("/{id}")
-    public Autore update(@PathVariable UUID id, @RequestBody NewAuthorPayload payload) {
-        return this.authorsService.findByIdAndUpdate(id, payload);
+    // PUT
+    @PutMapping("/{authorId}")
+    public Autore update(@PathVariable UUID authorId, @RequestBody NewAuthorPayload payload) {
+        return this.authorService.findByIdAndUpdate(authorId, payload);
     }
 
-    @DeleteMapping("/{id}")
+    // DELETE
+    @DeleteMapping("/{authorId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable UUID id) {
-        this.authorsService.findByIdAndDelete(id);
+    public void delete(@PathVariable UUID authorId) {
+        this.authorService.findByIdAndDelete(authorId);
     }
 }
