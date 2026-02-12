@@ -1,0 +1,27 @@
+package elisaraeli.U5_W2_D3.payloads;
+
+import jakarta.validation.constraints.*;
+
+import java.util.UUID;
+
+public record BlogPostDTO(
+        @NotBlank(message = "La categoria è obbligatoria")
+        @Size(min = 2, max = 30, message = "La categoria deve essere compresa tra i 2 e i 30 caratteri")
+        String categoria,
+
+        @NotBlank(message = "Il titolo è un campo obbligatorio")
+        @Size(min = 2, max = 30, message = "Il titolo deve essere compreso tra i 2 e i 30 caratteri")
+        String titolo,
+
+        @NotBlank(message = "Il contenuto è un campo obbligatorio")
+        @Size(min = 2, max = 30, message = "Il contenuto deve essere compreso tra i 2 e i 30 caratteri")
+        String contenuto,
+
+        @NotNull(message = "Il tempo di lettura è un campo obbligatorio")
+        @Min(value = 1, message = "Il tempo di lettura deve essere minimo 1 minuto")
+        @Max(value = 30, message = "Il tempo di lettura può essere massimo 30 minuti")
+        int tempoDiLettura,
+
+        @NotNull(message = "L'ID dell'autore è un campo obbligatorio")
+        UUID autoreId) {
+}
