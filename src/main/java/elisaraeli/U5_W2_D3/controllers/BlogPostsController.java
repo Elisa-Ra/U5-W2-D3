@@ -1,13 +1,17 @@
 package elisaraeli.U5_W2_D3.controllers;
 
 import elisaraeli.U5_W2_D3.entities.BlogPost;
-import elisaraeli.U5_W2_D3.payloads.NewBlogPostPayload;
+import elisaraeli.U5_W2_D3.exceptions.ValidationException;
+import elisaraeli.U5_W2_D3.payloads.BlogPostDTO;
 import elisaraeli.U5_W2_D3.services.BlogPostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -35,8 +39,17 @@ public class BlogPostsController {
     // POST
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public BlogPost create(@RequestBody NewBlogPostPayload payload) {
-        return this.blogPostService.save(payload);
+    public BlogPost create(@RequestBody @Validated BlogPostDTO payload, BindingResult validationResult) {
+        if (validationResult.hasErrors()) {
+            List<String> errorsList = validationResult.getFieldErrors()
+                    .stream()
+                    .map(fieldError -> fieldError.getDefaultMessage())
+                    .toList();
+
+            throw new ValidationException(errorsList);
+        } else {
+            return this.blogPostService.save(payload);
+        }
     }
 
     // GET by ID
@@ -47,8 +60,20 @@ public class BlogPostsController {
 
     // PUT
     @PutMapping("/{postId}")
-    public BlogPost update(@PathVariable UUID postId, @RequestBody NewBlogPostPayload payload) {
-        return this.blogPostService.findByIdAndUpdate(postId, payload);
+    public BlogPost update(@PathVariable UUID postId, @RequestBody @Validated BlogPostDTO payload, BindingResult validationResult
+    ) {
+        if (validationResult.hasErrors()) {
+            List<String> errorsList = validationResult.getFieldErrors()
+                    .stream()
+                    .map(fieldError -> fieldError.getDefaultMessage())
+                    .toList();
+
+            throw new ValidationException(errorsList);
+        } else {
+            return this.blogPostService.findByIdAndUpdate(postId, payload);
+        }
+
+
     }
 
     // DELETE

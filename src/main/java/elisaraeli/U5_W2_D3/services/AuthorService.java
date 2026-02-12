@@ -3,7 +3,7 @@ package elisaraeli.U5_W2_D3.services;
 import elisaraeli.U5_W2_D3.entities.Autore;
 import elisaraeli.U5_W2_D3.exceptions.BadRequestException;
 import elisaraeli.U5_W2_D3.exceptions.NotFoundException;
-import elisaraeli.U5_W2_D3.payloads.NewAuthorPayload;
+import elisaraeli.U5_W2_D3.payloads.AuthorDTO;
 import elisaraeli.U5_W2_D3.repositories.AutoreRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,31 +27,24 @@ public class AuthorService {
     }
 
     // Creazione autore
-    public Autore save(NewAuthorPayload payload) {
+    public Autore save(AuthorDTO payload) {
 
-        // Controllo che il nome / email non siano vuote
-        if (payload.getNome() == null || payload.getNome().isBlank()) {
-            throw new BadRequestException("Attenzione! Il nome non può essere vuoto");
-        }
-        if (payload.getEmail() == null || payload.getEmail().isBlank()) {
-            throw new BadRequestException("Attenzione! L'email non può essere vuota");
-        }
 
         //  Controllo che l'email non sia già stata utilizzata
-        autoreRepository.findByEmail(payload.getEmail()).ifPresent(a -> {
+        autoreRepository.findByEmail(payload.email()).ifPresent(a -> {
             throw new BadRequestException("Attenzione! L'email " + a.getEmail() + " è già stata usata.");
         });
 
         //  Creo l'autore
         Autore newAuthor = new Autore(
-                payload.getNome(),
-                payload.getCognome(),
-                payload.getEmail(),
-                payload.getDataDiNascita()
+                payload.nome(),
+                payload.cognome(),
+                payload.email(),
+                payload.dataDiNascita()
         );
 
         newAuthor.setAvatar("https://ui-avatars.com/api/?name=" +
-                payload.getNome() + "+" + payload.getCognome());
+                payload.nome() + "+" + payload.cognome());
 
         // Lo salvo
         Autore autoreSalvato = autoreRepository.save(newAuthor);
@@ -86,23 +79,23 @@ public class AuthorService {
     }
 
     // Aggiorno l'autore per ID
-    public Autore findByIdAndUpdate(UUID authorId, NewAuthorPayload payload) {
+    public Autore findByIdAndUpdate(UUID authorId, AuthorDTO payload) {
 
         Autore found = this.findById(authorId);
 
         // Se l'email cambia, controllo che non sia già in uso
-        if (!found.getEmail().equals(payload.getEmail())) {
-            autoreRepository.findByEmail(payload.getEmail()).ifPresent(a -> {
+        if (!found.getEmail().equals(payload.email())) {
+            autoreRepository.findByEmail(payload.email()).ifPresent(a -> {
                 throw new BadRequestException("L'email " + a.getEmail() + " è già in uso!");
             });
         }
 
-        found.setNome(payload.getNome());
-        found.setCognome(payload.getCognome());
-        found.setEmail(payload.getEmail());
-        found.setDataDiNascita(payload.getDataDiNascita());
+        found.setNome(payload.nome());
+        found.setCognome(payload.cognome());
+        found.setEmail(payload.email());
+        found.setDataDiNascita(payload.dataDiNascita());
         found.setAvatar("https://ui-avatars.com/api/?name=" +
-                payload.getNome() + "+" + payload.getCognome());
+                payload.nome() + "+" + payload.cognome());
 
         Autore modified = autoreRepository.save(found);
 

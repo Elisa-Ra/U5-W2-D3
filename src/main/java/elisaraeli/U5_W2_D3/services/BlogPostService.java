@@ -4,7 +4,7 @@ import elisaraeli.U5_W2_D3.entities.Autore;
 import elisaraeli.U5_W2_D3.entities.BlogPost;
 import elisaraeli.U5_W2_D3.exceptions.BadRequestException;
 import elisaraeli.U5_W2_D3.exceptions.NotFoundException;
-import elisaraeli.U5_W2_D3.payloads.NewBlogPostPayload;
+import elisaraeli.U5_W2_D3.payloads.BlogPostDTO;
 import elisaraeli.U5_W2_D3.repositories.AutoreRepository;
 import elisaraeli.U5_W2_D3.repositories.BlogPostRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -31,26 +31,26 @@ public class BlogPostService {
     }
 
     // Salvo
-    public BlogPost save(NewBlogPostPayload payload) {
+    public BlogPost save(BlogPostDTO payload) {
 
         // Controllo se il titolo / categoria sono vuoti
-        if (payload.getTitolo() == null || payload.getTitolo().isBlank()) {
+        if (payload.titolo() == null || payload.titolo().isBlank()) {
             throw new BadRequestException("Attenzione! Il titolo non può essere vuoto");
         }
-        if (payload.getCategoria() == null || payload.getCategoria().isBlank()) {
+        if (payload.categoria() == null || payload.categoria().isBlank()) {
             throw new BadRequestException("Attenzione! La categoria non può essere vuota");
         }
 
         //  Cerco l'autore per ID
-        Autore autore = autoreRepository.findById(payload.getAutoreId())
-                .orElseThrow(() -> new NotFoundException(payload.getAutoreId()));
+        Autore autore = autoreRepository.findById(payload.autoreId())
+                .orElseThrow(() -> new NotFoundException(payload.autoreId()));
 
         // Creo il post
         BlogPost newPost = new BlogPost(
-                payload.getCategoria(),
-                payload.getTitolo(),
-                payload.getContenuto(),
-                payload.getTempoDiLettura()
+                payload.categoria(),
+                payload.titolo(),
+                payload.contenuto(),
+                payload.tempoDiLettura()
         );
 
         newPost.setAutore(autore);
@@ -89,26 +89,26 @@ public class BlogPostService {
     }
 
     // Aggiorno il post per ID
-    public BlogPost findByIdAndUpdate(UUID postId, NewBlogPostPayload payload) {
+    public BlogPost findByIdAndUpdate(UUID postId, BlogPostDTO payload) {
 
         // Cerco il post
         BlogPost found = this.findById(postId);
 
         // Controllo che il titolo non sia vuoto
-        if (payload.getTitolo() == null || payload.getTitolo().isBlank()) {
+        if (payload.titolo() == null || payload.titolo().isBlank()) {
             throw new BadRequestException("Attenzione! Il titolo non può essere vuoto");
         }
 
         // Aggiorno i vari campi
-        found.setCategoria(payload.getCategoria());
-        found.setTitolo(payload.getTitolo());
-        found.setContenuto(payload.getContenuto());
-        found.setTempoDiLettura(payload.getTempoDiLettura());
+        found.setCategoria(payload.categoria());
+        found.setTitolo(payload.titolo());
+        found.setContenuto(payload.contenuto());
+        found.setTempoDiLettura(payload.tempoDiLettura());
 
         // Controllo se è cambiato l'autore del post e lo cambio
-        if (payload.getAutoreId() != null && !payload.getAutoreId().equals(found.getAutore().getId())) {
-            Autore autore = autoreRepository.findById(payload.getAutoreId())
-                    .orElseThrow(() -> new NotFoundException(payload.getAutoreId()));
+        if (payload.autoreId() != null && !payload.autoreId().equals(found.getAutore().getId())) {
+            Autore autore = autoreRepository.findById(payload.autoreId())
+                    .orElseThrow(() -> new NotFoundException(payload.autoreId()));
             found.setAutore(autore);
         }
 

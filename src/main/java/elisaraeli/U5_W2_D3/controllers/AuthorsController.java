@@ -1,13 +1,17 @@
 package elisaraeli.U5_W2_D3.controllers;
 
 import elisaraeli.U5_W2_D3.entities.Autore;
-import elisaraeli.U5_W2_D3.payloads.NewAuthorPayload;
+import elisaraeli.U5_W2_D3.exceptions.ValidationException;
+import elisaraeli.U5_W2_D3.payloads.AuthorDTO;
 import elisaraeli.U5_W2_D3.services.AuthorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -35,8 +39,18 @@ public class AuthorsController {
     // POST
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Autore create(@RequestBody NewAuthorPayload payload) {
-        return this.authorService.save(payload);
+    public Autore create(@RequestBody @Validated AuthorDTO payload, BindingResult validationResult) {
+        if (validationResult.hasErrors()) {
+
+            List<String> errorsList = validationResult.getFieldErrors()
+                    .stream()
+                    .map(fieldError -> fieldError.getDefaultMessage())
+                    .toList();
+
+            throw new ValidationException(errorsList);
+        } else {
+            return this.authorService.save(payload);
+        }
     }
 
     // GET by ID
@@ -47,9 +61,23 @@ public class AuthorsController {
 
     // PUT
     @PutMapping("/{authorId}")
-    public Autore update(@PathVariable UUID authorId, @RequestBody NewAuthorPayload payload) {
+    public Autore update(
+            @PathVariable UUID authorId,
+            @RequestBody @Validated AuthorDTO payload,
+            BindingResult validationResult
+    ) {
+        if (validationResult.hasErrors()) {
+            List<String> errorsList = validationResult.getFieldErrors()
+                    .stream()
+                    .map(fieldError -> fieldError.getDefaultMessage())
+                    .toList();
+
+            throw new ValidationException(errorsList);
+        }
+
         return this.authorService.findByIdAndUpdate(authorId, payload);
     }
+
 
     // DELETE
     @DeleteMapping("/{authorId}")
