@@ -5,6 +5,7 @@ import elisaraeli.U5_W2_D3.entities.BlogPost;
 import elisaraeli.U5_W2_D3.exceptions.BadRequestException;
 import elisaraeli.U5_W2_D3.exceptions.NotFoundException;
 import elisaraeli.U5_W2_D3.payloads.BlogPostDTO;
+import elisaraeli.U5_W2_D3.payloads.BlogPostPutDTO;
 import elisaraeli.U5_W2_D3.repositories.AutoreRepository;
 import elisaraeli.U5_W2_D3.repositories.BlogPostRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -89,7 +90,7 @@ public class BlogPostService {
     }
 
     // Aggiorno il post per ID
-    public BlogPost findByIdAndUpdate(UUID postId, BlogPostDTO payload) {
+    public BlogPost findByIdAndUpdate(UUID postId, BlogPostPutDTO payload) {
 
         // Cerco il post
         BlogPost found = this.findById(postId);
@@ -105,12 +106,6 @@ public class BlogPostService {
         found.setContenuto(payload.contenuto());
         found.setTempoDiLettura(payload.tempoDiLettura());
 
-        // Controllo se è cambiato l'autore del post e lo cambio
-        if (payload.autoreId() != null && !payload.autoreId().equals(found.getAutore().getId())) {
-            Autore autore = autoreRepository.findById(payload.autoreId())
-                    .orElseThrow(() -> new NotFoundException(payload.autoreId()));
-            found.setAutore(autore);
-        }
 
         // Salvo il post modificato
         BlogPost modified = blogPostRepository.save(found);

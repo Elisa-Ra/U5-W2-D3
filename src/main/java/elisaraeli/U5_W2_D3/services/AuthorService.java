@@ -1,5 +1,7 @@
 package elisaraeli.U5_W2_D3.services;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import elisaraeli.U5_W2_D3.entities.Autore;
 import elisaraeli.U5_W2_D3.exceptions.BadRequestException;
 import elisaraeli.U5_W2_D3.exceptions.NotFoundException;
@@ -12,7 +14,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -20,10 +25,12 @@ import java.util.UUID;
 public class AuthorService {
 
     private final AutoreRepository autoreRepository;
+    private final Cloudinary cloudinaryUploader;
 
     @Autowired
-    public AuthorService(AutoreRepository autoreRepository) {
+    public AuthorService(AutoreRepository autoreRepository, Cloudinary cloudinaryUploader) {
         this.autoreRepository = autoreRepository;
+        this.cloudinaryUploader = cloudinaryUploader;
     }
 
     // Creazione autore
@@ -109,6 +116,28 @@ public class AuthorService {
         Autore found = this.findById(authorId);
         autoreRepository.delete(found);
         log.info("L'autore è stato eliminato correttamente!");
+    }
+
+    public String uploadAvatar(MultipartFile file, UUID authorId) {
+        // 1. Controlli (es. Dimensione non può superare tot, oppure tipologia file solo .gif...)
+        // 2. Find by id dell'utente...
+        Autore trovato = this.findById(authorId);
+        try {
+            // 3. Upload del file su Cloudinary
+            Map result = cloudinaryUploader.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
+
+            String imageUrl = (String) result.get("secure_url");
+            // 4. Cloudinary ci torna l'url dell'immagine che salviamo dentro l'utente trovato
+            // ...aggiorno l'utente cambiandogli l'url dell'avatar
+            // 5. Return dell'url
+            trovato.setAvatar(imageUrl);
+            autoreRepository.save(trovato);
+            return imageUrl;
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 }
 

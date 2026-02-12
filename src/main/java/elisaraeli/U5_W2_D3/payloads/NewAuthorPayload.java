@@ -28,6 +28,6 @@ public class NewAuthorPayload {
     // NotBlank è per le String, quindi per la data di nascita uso NotNull
     // Inoltre, controllo che il formato sia quello accettato da JSON
     @NotNull(message = "La data di nascita è obbligatoria e deve essere nel formato yyyy-mm-dd")
-    @JsonFormat(pattern = "yyyy-mm-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate dataDiNascita;
 }

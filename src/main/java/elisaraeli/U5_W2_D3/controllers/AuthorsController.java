@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -84,5 +85,17 @@ public class AuthorsController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable UUID authorId) {
         this.authorService.findByIdAndDelete(authorId);
+    }
+
+    @PatchMapping("/{authorId}/avatar")
+    public String uploadImage(@RequestParam("avatar") MultipartFile file, @PathVariable UUID authorId) {
+        // avatar deve corrispondere ESATTAMENTE al campo del Form Data dove viene inserito il file
+        // se così non è il file non verrà trovato
+        // per controllare se il file c'è
+        //return file.getOriginalFilename();
+        //System.out.println(file.getSize());
+        String url = this.authorService.uploadAvatar(file, authorId);
+
+        return url; // TODO: cambiare return da String ad un payload in JSON
     }
 }

@@ -23,7 +23,7 @@ public record AuthorDTO(
 
 
         @NotNull(message = "La data di nascita è obbligatoria e deve essere nel formato yyyy-mm-dd")
-        @JsonFormat(pattern = "yyyy-mm-dd")
+        @JsonFormat(pattern = "yyyy-MM-dd")
         LocalDate dataDiNascita) {
 
 }

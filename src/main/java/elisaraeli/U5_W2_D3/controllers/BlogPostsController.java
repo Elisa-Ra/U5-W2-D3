@@ -3,6 +3,7 @@ package elisaraeli.U5_W2_D3.controllers;
 import elisaraeli.U5_W2_D3.entities.BlogPost;
 import elisaraeli.U5_W2_D3.exceptions.ValidationException;
 import elisaraeli.U5_W2_D3.payloads.BlogPostDTO;
+import elisaraeli.U5_W2_D3.payloads.BlogPostPutDTO;
 import elisaraeli.U5_W2_D3.services.BlogPostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -60,7 +61,7 @@ public class BlogPostsController {
 
     // PUT
     @PutMapping("/{postId}")
-    public BlogPost update(@PathVariable UUID postId, @RequestBody @Validated BlogPostDTO payload, BindingResult validationResult
+    public BlogPost update(@PathVariable UUID postId, @RequestBody @Validated BlogPostPutDTO payload, BindingResult validationResult
     ) {
         if (validationResult.hasErrors()) {
             List<String> errorsList = validationResult.getFieldErrors()
